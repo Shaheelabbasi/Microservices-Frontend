@@ -10,7 +10,7 @@ lerna-debug.log*
 # Ignore all node_modules directories
 node_modules/
 AuthService/
-ProductService/
+ProductsService/
 SearchService/
 **/node_modules/
 
