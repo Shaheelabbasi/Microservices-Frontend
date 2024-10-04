@@ -6,7 +6,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
-
+  const [searchQuery, setSearchQuery] = useState('');
   // Fetch categories from backend
   useEffect(() => {
     const fetchCategories = async () => {
@@ -46,6 +46,22 @@ const Products = () => {
     fetchProducts();
   }, [selectedCategory]); // Run effect when selectedCategory changes
 
+  const searchProducts=async()=>{
+    try {
+      console.log("search function has been called")
+      const response = await axios.get(`http://localhost:11000/mart/searchproducts?name=${searchQuery}`);
+      const { data } = response;
+      setSearchQuery("")
+      setSelectedCategory("All Categories")
+      console.log("All the products in search funtion are ",data.data)
+      setProducts(data.data);
+    } catch (error) {
+      console.log('Error searching  products:', error);
+    }
+  
+
+  }
+
   return (
     <div className="container mx-auto p-4">
       {/* Dropdown for categories */}
@@ -67,6 +83,25 @@ const Products = () => {
           ))}
         </select>
       </div>
+   {/* Input for Search Query */}
+   <div className="flex items-center ml- -1">
+          <input
+            type="text"
+            className="p-2 border rounded"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          
+          {/* Search Button */}
+          <button
+          onClick={searchProducts}
+            className="p-2 bg-blue-500 text-white rounded ml-4"
+          >
+            Search Products
+          </button>
+        </div>
+     
 
       {/* Flexbox layout for product cards */}
       <div className="flex flex-wrap justify-center gap-6">

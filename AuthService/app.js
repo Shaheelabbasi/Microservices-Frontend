@@ -36,16 +36,27 @@ const memoryUsageGauge = new client.Gauge({
     labelNames: ['route'],
 });
 
+// Track CPU usage per route
+const cpuUsageGauge = new client.Gauge({
+    name: 'cpu_usage_seconds',
+    help: 'CPU usage in seconds per route',
+    labelNames: ['route'],
+});
+
 // Register custom metrics
 register.registerMetric(httpRequestCounter);
 register.registerMetric(httpResponseDuration);
 register.registerMetric(memoryUsageGauge);
+register.registerMetric(cpuUsageGauge);
 
 // Collect default metrics (e.g., memory usage, process info)
 client.collectDefaultMetrics({ register });
 
 // Middleware to track metrics for each route
 const metricsMiddleware = (req, res, next) => {
+    // Start tracking CPU usage at the start of the request
+    const startCpuUsage = process.cpuUsage();
+
     // Start the timer to measure response duration
     const endTimer = httpResponseDuration.startTimer({
         method: req.method,
@@ -76,8 +87,16 @@ const metricsMiddleware = (req, res, next) => {
             route: routePath
         }, process.memoryUsage().heapUsed);
 
+        // Calculate CPU usage and update the gauge
+        const endCpuUsage = process.cpuUsage(startCpuUsage);
+        const cpuUsageInSeconds = (endCpuUsage.user + endCpuUsage.system) / 1e6; // Convert from microseconds to seconds
+        cpuUsageGauge.set({
+            route: routePath
+        }, cpuUsageInSeconds);
+
         // console.log(`Processed request: ${req.method} ${routePath} with status ${res.statusCode}`);
         // console.log(`Memory usage for ${routePath}: ${process.memoryUsage().heapUsed / 1024 / 1024} MB`);
+        // console.log(`CPU usage for ${routePath}: ${cpuUsageInSeconds} seconds`);
     });
 
     next();

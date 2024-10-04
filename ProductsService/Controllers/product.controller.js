@@ -185,12 +185,14 @@ const getProductsByCategory=asyncHandler(async(req,res)=>{
 
 // })
 
+
+
+
 module.exports={
      fetchAllProducts,
     // insertProducts,
     getCategories,
-    getProductsByCategory
-
+    getProductsByCategory,
 }
 
 
