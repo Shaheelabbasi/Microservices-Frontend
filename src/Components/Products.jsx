@@ -13,8 +13,9 @@ const Products = () => {
       try {
         const response = await axios.get('http://localhost:10000/mart/getallcategories');
         const { data } = response;
-        console.log("All the categories are ",data.data)
-        setCategories(data.data);
+        // setCategories(data.data);
+        // setCategories(...categories)
+        setCategories([{id:"345678",name:"All Categories"},...data.data])
       } catch (error) {
         console.log('Error fetching categories:', error);
       }
@@ -26,6 +27,7 @@ const Products = () => {
   // Fetch products from backend based on selected category
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("All the cateegories are jpp",categories)
       console.log("The selected category is ",selectedCategory)
       try {
         let response=null
@@ -49,10 +51,12 @@ const Products = () => {
   const searchProducts=async()=>{
     try {
       console.log("search function has been called")
+
+      console.log('the search query is ',searchQuery)
       const response = await axios.get(`http://localhost:11000/mart/searchproducts?name=${searchQuery}`);
       const { data } = response;
       setSearchQuery("")
-      setSelectedCategory("All Categories")
+      // setSelectedCategory("")
       console.log("All the products in search funtion are ",data.data)
       setProducts(data.data);
     } catch (error) {
@@ -76,7 +80,8 @@ const Products = () => {
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <option value="">{selectedCategory}</option>
-          {categories.map((category) => (
+          {
+          categories.map((category) => (
             <option key={category._id} value={category.name}>
               {category.name}
             </option>
